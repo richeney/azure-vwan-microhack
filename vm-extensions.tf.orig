@@ -1,7 +1,3 @@
-/*
-locals {
-  powershell = "https://raw.githubusercontent.com/${var.gh.user}/azure-vwan-microhack/${var.gh.branch}/powershell"
-}
 
 ##########################################################
 ## Install IIS role on spoke-1
@@ -16,11 +12,7 @@ resource "azurerm_virtual_machine_extension" "install-iis-spoke-1-vm" {
 
   settings = <<SETTINGS
     {
-      "commandToExecute":"powershell -ExecutionPolicy Unrestricted -File iis.ps1, iec.ps1",
-      "fileUris":[
-          "${local.powershell}/iis.ps1",
-          "${local.powershell}/iec.ps1"
-      ]
+        "commandToExecute":"powershell -ExecutionPolicy Unrestricted Add-WindowsFeature Web-Server; powershell -ExecutionPolicy Unrestricted Add-Content -Path \"C:\\inetpub\\wwwroot\\Default.htm\" -Value $($env:computername)"
     }
 SETTINGS
 }
@@ -107,7 +99,7 @@ resource "azurerm_virtual_machine_extension" "install-spoke-addc-vm" {
   settings = <<SETTINGS
     {
         "commandToExecute":"powershell -ExecutionPolicy Unrestricted -File addc.ps1",
-        "fileUris":["https://gist.githubusercontent.com/mddazure/fc3db37583cbfc80852f68a6b38bdc35/raw/d07b82133582199d2032b4d153bc3c696f88644f/addc.ps1"]
+        "fileUris":["https://gist.githubusercontent.com/mddazure/fc3db37583cbfc80852f68a6b38bdc35/raw/d07b82133582199d2032b4d153bc3c696f88644f/addc.ps1"] 
     }
 SETTINGS
 }
@@ -128,7 +120,7 @@ resource "azurerm_virtual_machine_extension" "enable-routing-nva-iptables-vm" {
     }
 SETTINGS
 }
-/*
+
 
 
 
@@ -139,7 +131,7 @@ SETTINGS
 ## Install ADDC role on spoke-addc-vm
 ##########################################################
 resource "azurerm_virtual_machine_extension" "install-spoke-addc-vm" {
-
+    
   name                 = "install-spoke-addc-vm"
   virtual_machine_id   = azurerm_virtual_machine.spoke-addc-vm.id
   publisher            = "Microsoft.Compute"
@@ -153,3 +145,4 @@ resource "azurerm_virtual_machine_extension" "install-spoke-addc-vm" {
 SETTINGS
 }
 */
+

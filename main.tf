@@ -1,7 +1,16 @@
+terraform {
+  required_providers {
+    azurerm = {
+      version = "= 2.43.0"
+      source  = "hashicorp/azurerm"
+    }
+  }
+}
+
 provider "azurerm" {
-  version = "2.43.0"
   features {}
 }
+
 #######################################################################
 ## Create Resource Group
 #######################################################################
@@ -9,19 +18,19 @@ provider "azurerm" {
 resource "azurerm_resource_group" "vwan-microhack-spoke-rg" {
   name     = "vwan-microhack-spoke-rg"
   location = var.location-spoke-1
- tags = {
+  tags = {
     environment = "spoke"
     deployment  = "terraform"
-    microhack    = "vwan"
+    microhack   = "vwan"
   }
 }
 
 resource "azurerm_resource_group" "vwan-microhack-hub-rg" {
   name     = "vwan-microhack-hub-rg"
   location = var.location-vwan
- tags = {
+  tags = {
     environment = "hub"
     deployment  = "terraform"
-    microhack    = "vwan"
+    microhack   = "vwan"
   }
 }

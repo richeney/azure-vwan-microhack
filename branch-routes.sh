@@ -1,4 +1,4 @@
-hubgwbgpaddress=$(az network vpn-gateway show --name microhack-we-hub-vng  -g vwan-microhack-hub-rg --query "bgpSettings.bgpPeeringAddresses[?ipconfigurationId == 'Instance0'].defaultBgpIpAddresses" --output tsv)
+hubgwbgpaddress=$(az network vpn-gateway show --name microhack-we-hub-vpngw  -g vwan-microhack-hub-rg --query "bgpSettings.bgpPeeringAddresses[?ipconfigurationId == 'Instance0'].defaultBgpIpAddresses" --output tsv)
 echo "Hub GW BGP address:" $hubgwbgpaddress
 
 echo "# VNETGW: Verify BGP peer status"
