@@ -1,8 +1,4 @@
 /*
-locals {
-  powershell = "https://raw.githubusercontent.com/${var.gh.user}/azure-vwan-microhack/${var.gh.branch}/powershell"
-}
-
 ##########################################################
 ## Install IIS role on spoke-1
 ##########################################################
@@ -16,11 +12,7 @@ resource "azurerm_virtual_machine_extension" "install-iis-spoke-1-vm" {
 
   settings = <<SETTINGS
     {
-      "commandToExecute":"powershell -ExecutionPolicy Unrestricted -File iis.ps1, iec.ps1",
-      "fileUris":[
-          "${local.powershell}/iis.ps1",
-          "${local.powershell}/iec.ps1"
-      ]
+        "commandToExecute":"powershell -ExecutionPolicy Unrestricted Add-WindowsFeature Web-Server; powershell -ExecutionPolicy Unrestricted Add-Content -Path \"C:\\inetpub\\wwwroot\\Default.htm\" -Value $($env:computername)"
     }
 SETTINGS
 }
@@ -128,7 +120,7 @@ resource "azurerm_virtual_machine_extension" "enable-routing-nva-iptables-vm" {
     }
 SETTINGS
 }
-/*
+
 
 
 
