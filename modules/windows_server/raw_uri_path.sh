@@ -19,7 +19,8 @@ which jq >/dev/null
 which git >/dev/null
 
 # Grab origin and branch
-branch=$(git branch --show-current)
+## branch=$(git branch --show-current) # Only available from git 2.22, and Cloud Shell has 2.20
+branch=$(git status | grep "^On branch" | sed 's/On branch //g')
 origin=$(git remote get-url origin | head -1 | grep ^"https://github.com/")
 origin=${origin##https://github.com/}
 user=${origin%%/*}
