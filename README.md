@@ -87,7 +87,7 @@ Steps:
 
 - Clone the GitHub repository:
 
-  `git clone https://github.com/mddazure/azure-vwan-microhack`
+  `git clone --branch windows_server_2022_preview https://github.com/richeney/azure-vwan-microhack`
 
 - Change directory:
 
