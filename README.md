@@ -115,7 +115,36 @@ Steps:
 
   `No changes. Infrastructure is up-to-date.`
 
-  If the plan shows that remaining missing resources need to be created then rerun `terraform apply`.
+- Incomplete deployments
+
+  If you have missing resources then rerunning `terraform plan` will shows what still needs to be created.
+
+  Rerun `terraform apply` will create those remaining resources.
+
+- Importing resources
+
+  If have had a disconnect or token expiration then the resource may have been created but Terraform won't have the result in your state file. You will get an error message similar to this:
+
+  ```text
+  │ Error: A resource with the ID "/subscriptions/2ca40be1-7e80-4f2b-92f7-06b2123a68cc/resourceGroups/vwan-microhack-hub-rg
+    /providers/Microsoft.Network/virtualHubs/microhack-we-hub" already exists - to be managed via Terraform this resource
+    needs to be imported into the State. Please see the resource documentation for "azurerm_virtual_hub" for more information.
+  │
+  │   with azurerm_virtual_hub.microhack-we-hub,
+  │   on vwan.tf line 7, in resource "azurerm_virtual_hub" "microhack-we-hub":
+  │    7: resource "azurerm_virtual_hub" "microhack-we-hub" {
+  │
+  ```
+
+  Import the resource into state. Here is the usage for the terraform import command:
+
+  `terraform import resource_address azure_resource_id`
+
+  Example command for above error:
+
+  `terraform import azurerm_virtual_hub.microhack-we-hub /subscriptions/2ca40be1-7e80-4f2b-92f7-06b2123a68cc/resourceGroups/vwan-microhack-hub-rg/providers/Microsoft.Network/virtualHubs/microhack-we-hub`
+
+  Once created resources have been imported then rerun `terraform plan` and `terraform apply`.
 
 ## Task 2: Explore and verify
 
