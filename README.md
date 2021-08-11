@@ -174,6 +174,14 @@ You can use WSL2 in combination with the [Windows Terminal](https://aka.ms/termi
 
   Once created resources have been successfully imported then rerun `terraform plan` and `terraform apply`.
 
+### Cleaning up
+
+Whilst we are using Terraform to create the base environment, we are not using it for the lifecycle of the Virtual WAN config.
+
+The following tasks will use the portal and CLI to configure the remaining sections.
+
+As a result, running `terraform destroy` may not remove the environment.
+
 ## Task 2: Explore and verify
 
 After the Terraform deployment concludes successfully, the following has been deployed into your subscription:
@@ -233,6 +241,15 @@ Under Routing configuration, select:
 Click on Create and wait for the connection to reach status Succeeded, then repeat the Add Connection for **spoke-2-vnet**.
 
 ![image](images/vwan-with-connections.png)
+
+If you wish to use the CLI for the second connection then the commands are:
+
+```bash
+vnetId=$(az network vnet show --resource-group vwan-microhack-spoke-rg --name spoke-2-vnet --query id --output tsv)
+az network vhub connection create --name spoke-2-we --remote-vnet $vnetId --resource-group vwan-microhack-hub-rg --vhub-name microhack-we-hub
+```
+
+Again, wait for the connection to succeed before continuing.
 
 Your Virtual WAN now looks like this:
 
@@ -894,7 +911,9 @@ You have explored VWAN routing to a good level of detail. As Virtual WAN grows a
 
 This MicroHack is available for you to use with your teams, your customers and partners to reinforce their understanding.
 
-## Final Task: Delete all resources
+## Final Task - Clean up
+
+### Delete all resources
 
 Delete the vwan-microhack-hub-rg and vwan-microhack-spoke-rg resource groups. This may take up to 30 minutes to compete. Check back to verify that all resources have indeed been deleted.
 
