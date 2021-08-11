@@ -503,7 +503,7 @@ The Spokes can now no longer talk between themselves:
 
 ![image](images/scenario4-allowedflows.png)
 
-
+> Note that not all red and green arrows are shown on these diagrams.
 
 ## Task 1: Connect Services Spoke
 
