@@ -396,7 +396,17 @@ In Cloud Shell, enter
 
 `./connect-us-east-spokes.sh`
 
-This will take a few minutes to complete. While the script runs, you can see the connections being added in the portal, in your microhack-vwan under Connectivity, Virtual network connections. Wait for both Connections to show status Succeeded, and for the Hub's Routing status to change from Provisioning to Succeeded.
+This will take a few minutes to complete.
+
+- View the microhack-vwan resource in the portal
+- Click on Connectivity -> Virtual Network Connections in the blade
+- Wait until both microhack-useast-hub's connections are in Succeeded state
+- Click on Connectivity -> Hubs and then the microhack-useast-hub resource
+- Wait until
+  - the Hub Status has changed from Updating to Succeeded
+  - the Routing status to changed from Provisioning to Provisioned
+
+The routes will not have been fully propagated until the hub and its connections are in a healthy state.
 
 ![image](images/scenario3-hubs.png)
 
