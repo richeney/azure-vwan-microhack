@@ -68,48 +68,74 @@ Although a Branch (site-to-site VPN) connection is part of this MicroHack, it do
 
 To make the most of your time on this MicroHack, the green elements in the diagram above are deployed and configured for you through Terraform. You will focus on deploying and configuring the blue items using the Azure portal and Cloud Shell.
 
-## Your Bash environment
+## Bash environment
+
+### Cloud Shell
 
 This microhack assumes a Bash environment with both Terraform and Azure CLI installed. The instructions are based on [Cloud Shell](https://shell.azure.com) which has both binaries preinstalled and is accessible from anywhere.
 
-However, a full Linux environment, e.g. Ubuntu on [Windows Subsystem for Linux](https://docs.microsoft.com/windows/wsl/) (WSL2), is highly recommended. (If using WSL2 then install both [Terraform](https://www.terraform.io/docs/cli/install/apt.html) and the [Azure CLI](https://docs.microsoft.com/cli/azure/install-azure-cli-linux?pivots=apt).)
+Cloud Shell in the browser requires no set up, but it can  suffer from timeouts for long deployments.
 
-The [Windows Terminal](https://aka.ms/terminal) is also recommended. Terminal automatically creates profiles for Command Prompt, PowerShell, PowerShell Core, any WSL2 distributions and Cloud Shell. Accessing Cloud Shell via Terminal is more robust than using the browser.
+### Windows Terminal
+
+Our preference is to use the [Windows Terminal](https://aka.ms/terminal), which automatically creates profiles for Command Prompt, PowerShell, PowerShell Core, any WSL2 distributions and also the Azure Cloud Shell.
+
+You can choose Azure Cloud Shell from the drop down, or set it as the default profile.
+
+![Windows Terminal](/images/WindowsTerminal.png)
+
+Accessing the Cloud Shell via Terminal is far more robust than using the browser.
+
+### Windows Subsystem for Linux
+
+For power users our recommendation is for a full Linux environment, e.g. Ubuntu on [Windows Subsystem for Linux](https://docs.microsoft.com/windows/wsl/) (WSL2).
+
+If using WSL2 then install both
+
+* [Terraform](https://www.terraform.io/docs/cli/install/apt.html)
+* [Azure CLI](https://docs.microsoft.com/cli/azure/install-azure-cli-linux?pivots=apt)
+
+Use WSL2 in combination with the [Windows Terminal](https://aka.ms/terminal).
 
 ## Task 1: Deploy
 
 ### Deployment steps
 
 - Log in to Azure Cloud Shell at https://shell.azure.com/ and select Bash
-- If necessary select your target subscription:
+
+- If necessary select your target subscription
+
+  `az account show`
+
+  `az account list --output table`
 
   `az account set --subscription <Name or ID of subscription>`
 
-- Clone the GitHub repository:
+- Clone the GitHub repository
 
   `git clone --branch windows_server_2022_preview https://github.com/richeney/azure-vwan-microhack`
 
-- Change directory:
+- Change directory
 
   `cd ./azure-vwan-microhack`
 
-- Initialize terraform:
+- Initialize terraform
 
   `terraform init`
 
   The initialization will download the azurerm resource provider.
 
-- Deploy the environment:
+- Deploy the environment
 
   `terraform apply`
 
   When prompted, confirm with **yes**. Deployment takes approximately 30 minutes.
 
-- Verify successful deployment
+- Verify deployment was successful
 
-  Cloud Shell sessions may time out. You may have missed success or error messages. Run a plan.
+  Cloud Shell sessions may time out. You may have missed success or error messages.
 
-  `terraform plan`
+  Run a `terraform plan` to check the current status.
 
   The command will complete with the following message if all resources have been created:
 
@@ -119,13 +145,13 @@ The [Windows Terminal](https://aka.ms/terminal) is also recommended. Terminal au
 
 - Incomplete deployments
 
-  If you have missing resources then rerunning `terraform plan` will shows what still needs to be created.
+  If something has gone wrong and you have missing resources then rerunning `terraform plan` will shows what still needs to be created.
 
-  Rerun `terraform apply` will create those remaining resources.
+  Rerun `terraform apply` to create those remaining resources.
 
 - Importing resources
 
-  If have had a disconnect or token expiration then the resource may have been created but Terraform won't have the result in your state file. You will get an error message similar to this:
+  If have had a disconnect or token expiration then the resource may have been created but Terraform won't have received the resulting JSON for your state file. You will get an error message similar to this:
 
   ```text
   │ Error: A resource with the ID "/subscriptions/2ca40be1-7e80-4f2b-92f7-06b2123a68cc/resourceGroups/vwan-microhack-hub-rg
@@ -146,7 +172,7 @@ The [Windows Terminal](https://aka.ms/terminal) is also recommended. Terminal au
 
   `terraform import azurerm_virtual_hub.microhack-we-hub /subscriptions/2ca40be1-7e80-4f2b-92f7-06b2123a68cc/resourceGroups/vwan-microhack-hub-rg/providers/Microsoft.Network/virtualHubs/microhack-we-hub`
 
-  Once created resources have been imported then rerun `terraform plan` and `terraform apply`.
+  Once created resources have been successfully imported then rerun `terraform plan` and `terraform apply`.
 
 ## Task 2: Explore and verify
 
