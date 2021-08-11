@@ -95,7 +95,7 @@ If using WSL2 then install both
 * [Terraform](https://www.terraform.io/docs/cli/install/apt.html)
 * [Azure CLI](https://docs.microsoft.com/cli/azure/install-azure-cli-linux?pivots=apt)
 
-Use WSL2 in combination with the [Windows Terminal](https://aka.ms/terminal).
+You can use WSL2 in combination with the [Windows Terminal](https://aka.ms/terminal) as it will detect your installed distros, such as Ubuntu in the screenshot above.
 
 ## Task 1: Deploy
 
