@@ -78,7 +78,7 @@ The [Windows Terminal](https://aka.ms/terminal) is also recommended. Terminal au
 
 ## Task 1: Deploy
 
-Steps:
+### Deployment steps
 
 - Log in to Azure Cloud Shell at https://shell.azure.com/ and select Bash
 - If necessary select your target subscription:
@@ -114,6 +114,8 @@ Steps:
   The command will complete with the following message if all resources have been created:
 
   `No changes. Infrastructure is up-to-date.`
+
+### Troubleshooting
 
 - Incomplete deployments
 
