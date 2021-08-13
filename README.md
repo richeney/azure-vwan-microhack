@@ -97,7 +97,7 @@ If using WSL2 then you will need both
 
 You can update all binaries and Azure CLI extensions with
 
-`
+`sudo apt update && sudo apt upgrade --yes && az upgrade`
 
 You can use WSL2 in combination with the [Windows Terminal](https://aka.ms/terminal) as it will detect your installed distros, such as Ubuntu in the screenshot above.
 
