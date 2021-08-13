@@ -394,26 +394,11 @@ resource "azurerm_network_interface" "spoke-addc-1-nic" {
 */
 
 #######################################################################
-## Using marketplace offering, so agree terms. Equivalent to:
-##  az term accept \
-##    --product "microsoftserveroperatingsystems-previews" \
-##    --publisher "microsoftwindowsserver" \
-##    --plan "windows-server-2022-azure-edition-preview"
-#######################################################################
-
-// resource "azurerm_marketplace_agreement" "windows_server_2022_preview" {
-//   publisher = "microsoftwindowsserver"
-//   offer     = "microsoftserveroperatingsystems-previews"
-//   plan      = "windows-server-2022-azure-edition-preview"
-// }
-
-#######################################################################
 ## Create Virtual Machine spoke-1
 #######################################################################
 
 module "spoke-1" {
   source     = "./modules/windows_server"
-  depends_on = [azurerm_marketplace_agreement.windows_server_2022_preview]
 
   name                = "spoke-1"
   location            = var.location-spoke-1
@@ -430,7 +415,6 @@ module "spoke-1" {
 
 module "spoke-2" {
   source     = "./modules/windows_server"
-  depends_on = [azurerm_marketplace_agreement.windows_server_2022_preview]
 
   name                = "spoke-2"
   location            = var.location-spoke-2
@@ -447,7 +431,6 @@ module "spoke-2" {
 
 module "spoke-3" {
   source     = "./modules/windows_server"
-  depends_on = [azurerm_marketplace_agreement.windows_server_2022_preview]
 
   name                = "spoke-3"
   location            = var.location-spoke-3
@@ -465,7 +448,6 @@ module "spoke-3" {
 
 module "spoke-4" {
   source     = "./modules/windows_server"
-  depends_on = [azurerm_marketplace_agreement.windows_server_2022_preview]
 
   name                = "spoke-4"
   location            = var.location-spoke-4
@@ -482,7 +464,6 @@ module "spoke-4" {
 
 module "onprem" {
   source     = "./modules/windows_server"
-  depends_on = [azurerm_marketplace_agreement.windows_server_2022_preview]
 
   name                = "onprem"
   location            = var.location-onprem
@@ -501,7 +482,6 @@ module "onprem" {
 
 module "spoke-addc" {
   source     = "./modules/windows_server"
-  depends_on = [azurerm_marketplace_agreement.windows_server_2022_preview]
 
   name                = "spoke-addc"
   location            = var.location-spoke-services
@@ -526,6 +506,7 @@ resource "azurerm_public_ip" "nva-iptables-vm-pub-ip" {
     microhack   = "vwan"
   }
 }
+
 resource "azurerm_network_security_group" "nva-iptables-vm-nsg" {
   name                = "nva-iptables-vm-nsg"
   location            = var.location-spoke-services
