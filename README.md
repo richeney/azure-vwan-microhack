@@ -90,10 +90,14 @@ Accessing the Cloud Shell via Terminal is far more robust than using the browser
 
 For power users our recommendation is for a full Linux environment, e.g. Ubuntu on [Windows Subsystem for Linux](https://docs.microsoft.com/windows/wsl/) (WSL2).
 
-If using WSL2 then install both
+If using WSL2 then you will need both
 
 * [Terraform](https://www.terraform.io/docs/cli/install/apt.html)
 * [Azure CLI](https://docs.microsoft.com/cli/azure/install-azure-cli-linux?pivots=apt)
+
+You can update all binaries and Azure CLI extensions with
+
+`
 
 You can use WSL2 in combination with the [Windows Terminal](https://aka.ms/terminal) as it will detect your installed distros, such as Ubuntu in the screenshot above.
 
@@ -101,15 +105,31 @@ You can use WSL2 in combination with the [Windows Terminal](https://aka.ms/termi
 
 ### Deployment steps
 
-- Log in to Azure Cloud Shell at https://shell.azure.com/ and select Bash
+- Log in to Azure Cloud Shell, using either
 
-- If necessary select your target subscription
+  - https://shell.azure.com/ and select Bash
+  - Login to the Cloud Shell profile in Window Terminal
+
+  > Alternatively, if you have full linux Bash environment, including WSL2 or MacOS, then you can use that instead.
+
+- Make sure you are in the correct subscription
 
   `az account show`
 
   `az account list --output table`
 
   `az account set --subscription <Name or ID of subscription>`
+
+- Accept Windows Server 2022 Preview terms
+
+  This repository currently uses a preview version of Windows Server 2022 so that we get the Microsoft Edge browser. You will need to accept the marketplace terms for it before deploying the environment:
+
+  ```bash
+  az term accept \
+    --product "microsoftserveroperatingsystems-previews" \
+    --publisher "microsoftwindowsserver" \
+    --plan "windows-server-2022-azure-edition-preview"
+  ```
 
 - Clone the GitHub repository
 

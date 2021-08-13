@@ -37,44 +37,6 @@ banner()
     return
 }
 
-## wait_for_succeeded()
-## {
-##   uri=$1
-##   echo -n 'Waiting until properties.provisioningState == "Succeeded"...'
-##   let n=0
-##   until [[ $n -gt 60  ]]
-##   do
-##     _json=$(az rest --method get --uri $uri --output json)
-##     _state=$(jq -r .properties.provisioningState <<<$_json)
-##
-##     case $_state in
-##       Succeeded)
-##         echo " successful!"
-##         return
-##         ;;
-##       Failed)
-##         echo "az rest --uri $uri"
-##         jq . <<< $_json
-##         error "Resource is in a failed state. Reset the vhub in the portal and rerun $(basename $0) once in a good state."
-##         ;;
-##       Provisioning)
-##         echo -n "."
-##         sleep 5
-##         ;;
-##       *)
-##         echo $_state
-##         sleep 5
-##         ;;
-##     esac
-##
-##     let n=n+1
-##   done
-##
-##   echo "az rest --uri $uri"
-##   jq . <<< $json
-##   error "Waiting for resource success has timed out."
-## }
-
 delete_route_table()
 {
   vhub=$1
@@ -146,3 +108,44 @@ delete_route_table()
 
   return
 }
+
+## Commented out as everything has moved to CLI commands
+## Retained for reference
+##
+## wait_for_succeeded()
+## {
+##   uri=$1
+##   echo -n 'Waiting until properties.provisioningState == "Succeeded"...'
+##   let n=0
+##   until [[ $n -gt 60  ]]
+##   do
+##     _json=$(az rest --method get --uri $uri --output json)
+##     _state=$(jq -r .properties.provisioningState <<<$_json)
+##
+##     case $_state in
+##       Succeeded)
+##         echo " successful!"
+##         return
+##         ;;
+##       Failed)
+##         echo "az rest --uri $uri"
+##         jq . <<< $_json
+##         error "Resource is in a failed state. Reset the vhub in the portal and rerun $(basename $0) once in a good state."
+##         ;;
+##       Provisioning)
+##         echo -n "."
+##         sleep 5
+##         ;;
+##       *)
+##         echo $_state
+##         sleep 5
+##         ;;
+##     esac
+##
+##     let n=n+1
+##   done
+##
+##   echo "az rest --uri $uri"
+##   jq . <<< $json
+##   error "Waiting for resource success has timed out."
+## }

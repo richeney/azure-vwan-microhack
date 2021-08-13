@@ -401,11 +401,11 @@ resource "azurerm_network_interface" "spoke-addc-1-nic" {
 ##    --plan "windows-server-2022-azure-edition-preview"
 #######################################################################
 
-resource "azurerm_marketplace_agreement" "windows_server_2022_preview" {
-  publisher = "microsoftwindowsserver"
-  offer     = "microsoftserveroperatingsystems-previews"
-  plan      = "windows-server-2022-azure-edition-preview"
-}
+// resource "azurerm_marketplace_agreement" "windows_server_2022_preview" {
+//   publisher = "microsoftwindowsserver"
+//   offer     = "microsoftserveroperatingsystems-previews"
+//   plan      = "windows-server-2022-azure-edition-preview"
+// }
 
 #######################################################################
 ## Create Virtual Machine spoke-1
