@@ -700,7 +700,7 @@ Below are optional challenges on network security in Virtual WAN with Network Vi
 
 Run this script to delete all resources:
 
-`./clean-up-after-scenario-4.sh`
+`./clean-up.sh`
 
 This may take up to 30 minutes to compete. Remember to verify that all resources have indeed been deleted.
 

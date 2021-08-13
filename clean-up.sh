@@ -1,10 +1,13 @@
 #!/bin/bash
 ##########################################################
-# clean-up-after-scenario-4.sh
+# clean-up.sh
 ##########################################################
 
 # Source our bash library
 . ./lib.sh
+
+# Check we're authenticated
+az group list --output none || error "Issue with expired Azure token? Log back in with \"az login\"."
 
 vwan=microhack-vwan
 rg=vwan-microhack-hub-rg
@@ -22,7 +25,7 @@ do
     az network vhub connection delete --name $connection --vhub-name microhack-we-hub --resource-group vwan-microhack-hub-rg --yes --output none
     [[ $? -eq 0 ]] && echo "✔️" || error "Failed to delete connection $connection from vhub microhack-we-hub"
   else
-    echo "The $connection connection has already been removed."
+    echo "The $connection connection not found. Skipping."
   fi
 done
 
@@ -40,7 +43,7 @@ delete_route_table microhack-useast-hub RT-Shared-useast
 
 ####################################################################
 
-banner "Final cleanup steps"
+banner "Removing branch"
 
 echo "Disconnecting branch"
 az network vpn-gateway connection delete --gateway-name microhack-we-hub-vpngw --name onprem -g vwan-microhack-hub-rg
@@ -48,6 +51,10 @@ az network vpn-site delete --name onprem -g vwan-microhack-hub-rg
 
 echo "Deleting VPN gateway"
 az network vpn-gateway delete --name microhack-we-hub-vpngw -g vwan-microhack-hub-rg
+
+####################################################################
+
+banner "Final cleanup steps"
 
 echo "Deleting virtual hubs"
 vhubids=$(az network vhub list --resource-group vwan-microhack-hub-rg --query [].id --output tsv)

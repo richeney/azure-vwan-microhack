@@ -22,7 +22,7 @@ do
     az network vhub connection delete --name $connection --vhub-name microhack-we-hub --resource-group vwan-microhack-hub-rg --yes --output none
     [[ $? -eq 0 ]] && echo "✔️" || error "Failed to delete connection $connection from vhub microhack-we-hub"
   else
-    echo "The $connection connection has already been removed."
+    echo "The $connection connection not found. Skipping."
   fi
 done
 

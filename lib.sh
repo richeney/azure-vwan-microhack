@@ -43,13 +43,13 @@ delete_route_table()
   rt=$2
 
   rg=vwan-microhack-hub-rg
-  vhubid=$(az network vhub show --name $vhub --resource-group $rg --query id --output tsv)
-  [[ $? -ne 0 ]] && error "Virtual hub $vhub not found in resource group $rg"
+  vhubid=$(az network vhub show --name $vhub --resource-group $rg --query id --output tsv 2>/dev/null)
+  [[ $? -ne 0 ]] && { echo "Vhub $vhub not found in $rg. Skipping."; return; }
 
   defaultrtid=$vhubid/hubRouteTables/defaultRouteTable
 
   rtid=$(az network vhub route-table show --name $rt --vhub-name $vhub --resource-group $rg --query id --output json 2>/dev/null)
-  [[ $? -ne 0 ]] && { echo "Route table $rt not found in vhub $vhub. Continuing."; return; }
+  [[ $? -ne 0 ]] && { echo "Route table $rt not found in vhub $vhub. Skipping."; return; }
 
   echo "Switching any associations to the defaultRouteTable"
   associated=$(az network vhub route-table show --name $rt --vhub-name $vhub --resource-group $rg --output json --query associatedConnections --output tsv)
