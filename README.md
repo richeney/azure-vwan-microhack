@@ -145,13 +145,13 @@ You can use WSL2 in combination with the [Windows Terminal](https://aka.ms/termi
 
 - Incomplete deployments
 
-  If something has gone wrong and you have missing resources then rerunning `terraform plan` will shows what still needs to be created.
+  If something has gone wrong and you have missing resources then rerunning `terraform plan` will display the plan for the remaining resources to be created.
 
   Rerun `terraform apply` to create those remaining resources.
 
 - Importing resources
 
-  If have had a disconnect or token expiration then the resource may have been created but Terraform won't have received the resulting JSON for your state file. You will get an error message similar to this:
+  If have had a disconnect or token expiration then a resource may have been created but Terraform won't have received the resulting JSON for your state file. Running a plan or apply will get an error message similar to this:
 
   ```text
   │ Error: A resource with the ID "/subscriptions/2ca40be1-7e80-4f2b-92f7-06b2123a68cc/resourceGroups/vwan-microhack-hub-rg
@@ -164,7 +164,9 @@ You can use WSL2 in combination with the [Windows Terminal](https://aka.ms/termi
   │
   ```
 
-  Import the resource into state. Here is the usage for the terraform import command:
+  The fastest thing to do is to import the resource into state.
+
+  Here is the usage for the terraform import command:
 
   `terraform import resource_address azure_resource_id`
 
@@ -173,14 +175,6 @@ You can use WSL2 in combination with the [Windows Terminal](https://aka.ms/termi
   `terraform import azurerm_virtual_hub.microhack-we-hub /subscriptions/2ca40be1-7e80-4f2b-92f7-06b2123a68cc/resourceGroups/vwan-microhack-hub-rg/providers/Microsoft.Network/virtualHubs/microhack-we-hub`
 
   Once created resources have been successfully imported then rerun `terraform plan` and `terraform apply`.
-
-### Cleaning up
-
-Whilst we are using Terraform to create the base environment, we are not using it for the lifecycle of the Virtual WAN config.
-
-The following tasks will use the portal and CLI to configure the remaining sections.
-
-As a result, running `terraform destroy` may not remove the environment.
 
 ## Task 2: Explore and verify
 
@@ -204,6 +198,25 @@ Credentials are identical for all VMs, as follows:
 You may log on to each VM through Bastion. Open the Microsoft Edge browser and access <http://localhost>. You will see a blank page with the VM name in the upper left corner.
 
 When logging on to the ADDC VM before it is ready, you will see "Waiting for the Group Policy Client". That is OK, just let it run while you proceed with the lab.
+
+## Cleaning up
+
+:exclamation: First of all, don't remove the environment! We have the labs to do. This section is purely informational so you know what to do later.
+
+* Whilst we are using Terraform to create the base environment, we are not using it for the lifecycle of the Virtual WAN config.
+* The following tasks will use the portal and CLI to configure the environment, and this will start creating drift from the terraform config including new links and dependencies between resources.
+* As a result, running `terraform destroy` will not cleanly remove the environment.
+
+There is a clean up script mentioned at the end of lab 4.
+
+When you are done with the labs then you can run the script to tear down the lab environment as retaining those resources will incur Azure charges.
+
+Running the script _should_ clean up the environment, removing these two resource groups:
+
+1. vwan-microhack-hub-rg
+1. vwan-microhack-spoke-rg
+
+Double check that it has been successful by ensuring that they have been deleted.
 
 # Scenario 1: Single Region Virtual WAN with Default Routing
 
