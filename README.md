@@ -95,11 +95,11 @@ If using WSL2 then you will need both
 * [Terraform](https://www.terraform.io/docs/cli/install/apt.html)
 * [Azure CLI](https://docs.microsoft.com/cli/azure/install-azure-cli-linux?pivots=apt)
 
-You can update all binaries and Azure CLI extensions with
+The following command will update all binaries and Azure CLI extensions in an Ubuntu distro.
 
 `sudo apt update && sudo apt upgrade --yes && az upgrade`
 
-You can use WSL2 in combination with the [Windows Terminal](https://aka.ms/terminal) as it will detect your installed distros, such as Ubuntu in the screenshot above.
+You can use WSL2 in combination with the [Windows Terminal](https://aka.ms/terminal) as it will detect your installed distros.
 
 ## Task 1: Deploy
 
@@ -113,6 +113,8 @@ You can use WSL2 in combination with the [Windows Terminal](https://aka.ms/termi
   > Alternatively, if you have full linux Bash environment, including WSL2 or MacOS, then you can use that instead.
 
 - Make sure you are in the correct subscription
+
+  Example commands:
 
   `az account show`
 
@@ -133,21 +135,29 @@ You can use WSL2 in combination with the [Windows Terminal](https://aka.ms/termi
 
 - Clone the GitHub repository
 
-  `git clone --branch windows_server_2022_preview https://github.com/richeney/azure-vwan-microhack`
+  ```bash
+  git clone --branch windows_server_2022_preview https://github.com/richeney/azure-vwan-microhack
+  ```
 
 - Change directory
 
-  `cd ./azure-vwan-microhack`
+  ```bash
+  cd ./azure-vwan-microhack
+  ```
 
 - Initialize terraform
 
-  `terraform init`
+  ```bash
+  terraform init
+  ```
 
   The initialization will download the azurerm resource provider.
 
 - Deploy the environment
 
-  `terraform apply`
+  ```bash
+  terraform apply
+  ```
 
   When prompted, confirm with **yes**. Deployment takes approximately 30 minutes.
 
@@ -188,11 +198,15 @@ You can use WSL2 in combination with the [Windows Terminal](https://aka.ms/termi
 
   Here is the usage for the terraform import command:
 
-  `terraform import resource_address azure_resource_id`
+  ```bash
+  terraform import resource_address azure_resource_id
+  ```
 
   Example command for above error:
 
-  `terraform import azurerm_virtual_hub.microhack-we-hub /subscriptions/2ca40be1-7e80-4f2b-92f7-06b2123a68cc/resourceGroups/vwan-microhack-hub-rg/providers/Microsoft.Network/virtualHubs/microhack-we-hub`
+  ```bash
+  terraform import azurerm_virtual_hub.microhack-we-hub /subscriptions/2ca40be1-7e80-4f2b-92f7-06b2123a68cc/resourceGroups/vwan-microhack-hub-rg/providers/Microsoft.Network/virtualHubs/microhack-we-hub
+  ```
 
   Once created resources have been successfully imported then rerun `terraform plan` and `terraform apply`.
 
@@ -254,7 +268,9 @@ In the portal, in the Properties view of the VM Overview blade, click on Network
 
 Alternatively, in Cloud Shell, issue this command:
 
-`az network nic show-effective-route-table -g vwan-microhack-spoke-rg -n spoke-1-nic --output table`
+```bash
+az network nic show-effective-route-table -g vwan-microhack-spoke-rg -n spoke-1-nic --output table
+```
 
 :question: Is there a specific route for spoke-2-vnet (172.16.2.0/24)?
 
@@ -330,7 +346,9 @@ We are simulating a Branch site by means of a VNET with a VNET Gateway. In reali
 In Cloud Shell, in the azure-vwan-microhack directory
 - Run the connect-branch shell script:
 
-`./connect-branch.sh`
+```bash
+./connect-branch.sh
+```
 
 The script contains Azure CLI commands that create following resources:
 - A VPN Site named "onprem" in the Virtual WAN
@@ -355,7 +373,9 @@ Open Edge and browse to spoke-1-vm at 172.16.1.4 and spoke-2-vm at 172.16.2.4.
 ### :point_right: BGP routing exchange over VPN
 In Cloud Shell, in the azure-vwan-microhack directory, run the branch-routes script:
 
-`./branch-routes.sh`
+```bash
+./branch-routes.sh
+```
 
 This scripts pulls information on the BGP session from the VNET Gateway vnet-onprem-gw.
 
@@ -368,16 +388,21 @@ Now observe Effective Routes for onprem-vm.
 
  Alternatively, in Cloud Shell, issue this command:
 
-`az network nic show-effective-route-table -g vwan-microhack-spoke-rg -n onprem-nic --output table`
+```bash
+az network nic show-effective-route-table -g vwan-microhack-spoke-rg -n onprem-nic --output table
+```
 
 :exclamation: Note that routes are present for the Spoke VNETs, pointing to the local VNET VPN Gateway.
 
 The VNET Gateway learned the routes for the Spoke VNETs via BGP and programmed them into the vm route table automatically, without the need to install UDRs.
 
 ### :point_right: Spoke routes
+
 Observe Effective Routes for spoke-1-vm:
 
-`az network nic show-effective-route-table -g vwan-microhack-spoke-rg -n spoke-1-nic --output table`
+```
+az network nic show-effective-route-table -g vwan-microhack-spoke-rg -n spoke-1-nic --output table
+```
 
 :exclamation: Notice that spoke-vm-1 now has routes for the IP ranges of the onprem site, 10.0.1.0/24 and 10.0.2.0/24. This site is connected via VPN, and although "Source" and "Next Hop Type" are the same as for peered VNET spoke-2-vnet, the next hop address is different.
 
@@ -397,6 +422,7 @@ Click on Effective Routes. In the drop downs on the next page, select Route Tabl
 Realize that the Route Service itself is not in the data path for branch traffic. The Route Service acts as a route reflector, traffic flows directly between the VM in the spoke and VPN Gateway.
 
 # Scenario 3: Multi-regional Virtual WAN
+
 We will now expand the Virtual WAN across regions by adding a Hub with Spokes in the US East region.
 
 A key take away from this scenario is that each hub runs its own routing instance and contains its own routing tables.
@@ -418,7 +444,11 @@ As this Hub will not contain any gateways, skip the other tabs, click Review + c
 
 Alternatively, in Cloud Shell, issue this command:
 
-`az network vhub create --address-prefix 192.168.1.0/24 --name microhack-useast-hub --vwan microhack-vwan --resource-group vwan-microhack-hub-rg --location eastus --sku Standard`
+```bash
+az network vhub create --name microhack-useast-hub --vwan microhack-vwan \
+  --address-prefix 192.168.1.0/24 --sku Standard \
+  --resource-group vwan-microhack-hub-rg --location eastus
+```
 
 This will take a few minutes to complete.
 
@@ -427,7 +457,9 @@ Connect spoke-3-vnet and spoke-4-vnet to the new Hub. We connected VNETs through
 
 In Cloud Shell, enter
 
-`./connect-us-east-spokes.sh`
+```bash
+./connect-us-east-spokes.sh
+```
 
 This will take a few minutes to complete.
 
@@ -456,7 +488,9 @@ Do the same from on-prem-vm.
 
 Observe Effective Routes for spoke-1-vm, either in the portal or in Cloud Shell through
 
-`az network nic show-effective-route-table -g vwan-microhack-spoke-rg -n spoke-1-nic --output table`
+```bash
+az network nic show-effective-route-table -g vwan-microhack-spoke-rg -n spoke-1-nic --output table
+```
 
 :question: Which routes have been added to spoke-1-vm's route table?
 
@@ -466,7 +500,9 @@ Observe Effective Routes for spoke-1-vm, either in the portal or in Cloud Shell 
 
 Now observe Effective Routes for spoke-3-vm, which is in Spoke 3 connected to the US East Hub:
 
-`az network nic show-effective-route-table -g vwan-microhack-spoke-rg -n spoke-3-nic --output table`
+```bash
+az network nic show-effective-route-table -g vwan-microhack-spoke-rg -n spoke-3-nic --output table
+```
 
 :exclamation: Note all routes, both for the US East "local" Spoke 4 and "remote" West Europe destinations, have the address of the Route Service in the US East Hub as their next hop.
 
@@ -475,7 +511,9 @@ Again, realize that Virtual WAN installed these routes in the Spoke VNETs automa
 ### :point_right: BGP routing exchange over VPN
 In Cloud Shell, run the branch-routes script:
 
-`./branch-routes.sh`
+```bash
+./branch-routes.sh
+```
 
 :question: Compare the AS path of the new routes for Spokes 3 and 4, to the AS path of the routes for Spokes 1 and 2. Why are they different?
 
@@ -514,6 +552,7 @@ Labels are a method of grouping Route Tables across Hubs, so that they do not ha
 In the next scenario we will explore custom routing patterns enabled by deploying additional routing tables to our hubs.
 
 # Scenario 4: Isolated Spokes and Shared Services Spoke
+
 :exclamation: The following is scenario is quite advanced and will take some time and effort.
 
 Imagine an IT department that must facilitate DevOps teams. IT operates a number of central services, such as the networks in and between Azure and on-premise, and the Active Directory domain.
@@ -542,7 +581,9 @@ The Spokes can now no longer talk between themselves:
 
 Run the following in Cloud Shell to connect services-vnet to microhack-we-hub:
 
-`./connect-services-spoke.sh`
+```bash
+./connect-services-spoke.sh
+```
 
 Wait for the connection to complete and show status Succeeded in the portal.
 
@@ -635,13 +676,20 @@ Try to ping spoke-addc-vm (172.16.10.4).
 The Shared Service VNET contains an AD domain controller.
 
 To demonstrate connectivity from the Spokes to the Shared Services VNET, you can optionally join one or more spoke vm's to the domain.
+
 - Point the DNS in spoke-vnet-1 to spoke-addc-vm, in Cloud Shell:
 
-`az network vnet update --name spoke-1-vnet --resource-group vwan-microhack-spoke-rg --dns-servers 172.16.10.4`
+  ```bash
+  az network vnet update --name spoke-1-vnet \
+    --dns-servers 172.16.10.4 \
+    --resource-group vwan-microhack-spoke-rg
+  ```
 
 - On spoke-1-vm, open a command prompt and enter:
 
-`ipconfig /renew`
+  ```bash
+  ipconfig /renew
+  ```
 
 - On spoke-1-vm, open Server Manager and click Local Server.
 - Then click WORKGROUP, click the Change ... button, select the Domain radio button under Member of and enter micro-hack.local, click OK.
@@ -657,13 +705,19 @@ The machine will now join the domain and will need to be restarted for this chan
 
 View Effective Routes for spoke-1-vm, in the portal or in Cloud Shell:
 
-`az network nic show-effective-route-table -g vwan-microhack-spoke-rg -n spoke-1-nic --output table`
+```bash
+az network nic show-effective-route-table --name spoke-1-nic \
+  --resource-group vwan-microhack-spoke-rg --output table
+```
 
 :question: Identify the routes that you see. Which routes are not there and is that as expected?
 
 View Effective Routes for spoke-addc-vm:
 
-`az network nic show-effective-route-table -g vwan-microhack-spoke-rg -n spoke-addc-1-nic --output table`
+```bash
+az network nic show-effective-route-table --name spoke-addc-1-nic \
+  --resource-group vwan-microhack-spoke-rg --output table
+```
 
 :question: Again identify the routes that you see. What is different here from the routes at spoke-vm-1?
 
@@ -690,6 +744,7 @@ Now view RT-Shared-useast and Default tables for the US East Hub.
 :exclamation: Note that the Default table does not contain routes. The Default route table of the US East Hub does not have any connections Associated with it. It does have connections Propagating into it, so should contain routing information. *Apparently* a route table shows empty when it has no connections Associated, i.e. nothing to consume its routing information.
 
 # Close out
+
 You have explored VWAN routing to a good level of detail. As Virtual WAN grows and matures, it is important you have a good understanding of this topic to guide and help customers in a variety of use cases. This MicroHack is available for you to use with your teams, your customers and partners to reinforce their understanding.
 
 Below are optional challenges on network security in Virtual WAN with Network Virtual Appliances and Secured Hubs. Use this content at your own pace to expand your knowledge and skills.
@@ -698,15 +753,20 @@ Below are optional challenges on network security in Virtual WAN with Network Vi
 
 ## Final Task: Delete all resources
 
-Run this script to delete all resources:
+If you are all done with the labs and you're not tempted by the optional challenges then you can run this script to delete all resources:
 
-`./clean-up.sh`
+```bash
+./clean-up.sh
+```
 
 This may take up to 30 minutes to compete. Remember to verify that all resources have indeed been deleted.
 
 In Cloud Shell, delete the azure-vwan-microhack directory:
 
-`rm -rf azure-vwan-microhack`
+```bash
+cd ..
+rm -rf azure-vwan-microhack
+```
 
 
 # Scenario 5 (Optional): Filter traffic through a Network Virtual Appliance
@@ -735,7 +795,9 @@ A number of changes must be made to prepare the Virtual WAN for this scenario:
 
 To implement these changes, run this script in Cloud Shell:
 
-`./prep-for-scenario-5.sh`
+```bash
+./prep-for-scenario-5.sh
+```
 
 This will take a few minutes to complete.
 
@@ -744,7 +806,9 @@ We must now add UDRs to the subnet vmSubnet in both Spoke 1 and Spoke 2 VNETs, t
 
 Run this script in Cloud Shell:
 
-`./add-udrs-scenario5.sh`
+```bash
+./add-udrs-scenario5.sh
+```
 
 In the portal, verify that a Route table (UDR) named "default-to-nva" has been created, and is associated subnet vmSubnet in both spoke-1-vnet and spoke-2-vnet.
 
@@ -801,7 +865,10 @@ We will first look at the routes of one of the tiered Spokes. This is one of the
 
 View Effective Routes for spoke-1-vm, in the portal or in Cloud Shell:
 
-`az network nic show-effective-route-table -g vwan-microhack-spoke-rg -n spoke-1-nic --output table`
+```bash
+az network nic show-effective-route-table --name spoke-1-nic \
+  --resource-group vwan-microhack-spoke-rg --output table
+```
 
 :question: Identify the routes that you see. Comparing to Spoke routes we saw in previous scenario's, which routes are not there and is that as expected? Which route is now present and why?
 
@@ -809,7 +876,10 @@ View Effective Routes for spoke-1-vm, in the portal or in Cloud Shell:
 
 View Effective Routes for spoke-3-vm, in the portal or in Cloud Shell:
 
-`az network nic show-effective-route-table -g vwan-microhack-spoke-rg -n spoke-3-nic --output table`
+```bash
+az network nic show-effective-route-table --name spoke-3-nic \
+  --resource-group vwan-microhack-spoke-rg --output table
+```
 
 :question: Identify the routes that you see. Comparing to Spoke routes we saw in previous scenario's, is this now different and why (not)?. From the perspective of Spoke 3, has placing Spokes 1 and 2 behind an NVA VNET on the *remote* hub changed its view of the network?
 
@@ -828,7 +898,9 @@ Now view Effective Routes for the Default table of the US East hub.
 :point_right: Outbound internet access
 
 Traffic outbound to the internet from Spokes 1 and 2 is directed to the NVA, and it goes out via the NVA's public IP address. Verify this by browsing to www.whatismyipaddress.com from spoke-1-vm, check that the ip address reported is the public ip of the NVA shown in the portal.
+
 ## Task 6: Outbound internet access from the VWAN via NVA in Spoke
+
 Outbound internet from spoke vnets directly connected to the VWAN, such as Spokes 3 and 4, can be forced through the NVA in the Spoke as well. This requires a custom route in the Hub default route tables, for destination prefix 0.0.0.0/0 pointing to the nva-vnet connection.
 
 :thumbsup: VWAN now supports the default route 0.0.0.0/0 as a custom route entry.
@@ -841,7 +913,10 @@ In the Spokes directly connected to one of the Hubs, the 0.0.0.0/0 route no long
 
 View Effective Routes for spoke-3-vm in Cloud Shell:
 
-`az network nic show-effective-route-table -g vwan-microhack-spoke-rg -n spoke-3-nic --output table`
+```bash
+az network nic show-effective-route-table --name spoke-3-nic \
+  --resource-group vwan-microhack-spoke-rg --output table
+```
 
 :exclamation: Note that 0.0.0.0/0 now points to the public IP address of the Route Service in the East US Hub.
 
@@ -852,6 +927,10 @@ On the East US Hub, view Effective Routes for the Default Route Table in the por
 Now view Effective Routes for nva-iptables-vm in Cloud Shell:
 
 `az network nic show-effective-route-table -g vwan-microhack-spoke-rg -n nva-iptables-vm-nic-1 --output table`
+```bash
+az network nic show-effective-route-table --name nva-iptables-vm-nic-1 \
+  --resource-group vwan-microhack-spoke-rg --output table
+```
 
 :exclamation: Note that 0.0.0.0/0 points to the public IP address of the Route Service in the West Europe Hub.
 
@@ -883,7 +962,9 @@ To put the VWAN back into "default" state, a number of changes must be made:
 
 To implement these changes, run this script in Cloud Shell:
 
-`./prep-for-scenario-6.sh`
+```bash
+./prep-for-scenario-6.sh
+```
 
 This will take a few minutes to complete.
 
@@ -941,13 +1022,19 @@ Select all Connections, in the drop down under **Internet traffic** select Azure
 
 In Cloud Shell, pull up Effective routes of spoke-1-vm:
 
-`az network nic show-effective-route-table -g vwan-microhack-spoke-rg -n spoke-1-nic --output table`
+```bash
+az network nic show-effective-route-table --name spoke-1-nic \
+  --resource-group vwan-microhack-spoke-rg --output table
+```
 
 :question: where does the default route (0.0.0.0/0) point?
 
 Display the ip addresses of the he Azure Firewall in the secured hub:
 
-`az network firewall show -g vwan-microhack-hub-rg -n AzureFirewall_microhack-we-hub --query hubIpAddresses`
+```bash
+az network firewall show --name AzureFirewall_microhack-we-hub \
+  --resource-group vwan-microhack-hub-rg --query hubIpAddresses
+```
 
 :exclamation: Note that the default route now points to the private (inside) address of the Azure Firewall instance in the secured hub.
 
@@ -972,4 +1059,7 @@ Delete the vwan-microhack-hub-rg and vwan-microhack-spoke-rg resource groups. Th
 
 In Cloud Shell, delete the azure-vwan-microhack directory:
 
-`rm -rf azure-vwan-microhack`
+```bash
+cd ..
+rm -rf azure-vwan-microhack
+```
