@@ -1,85 +1,64 @@
-spoke1vnetid=$(az network vnet show -g vwan-microhack-spoke-rg -n spoke-1-vnet --query "id" --output tsv)
-spoke2vnetid=$(az network vnet show -g vwan-microhack-spoke-rg -n spoke-2-vnet --query "id" --output tsv)
-spoke3vnetid=$(az network vnet show -g vwan-microhack-spoke-rg -n spoke-3-vnet --query "id" --output tsv)
-spoke4vnetid=$(az network vnet show -g vwan-microhack-spoke-rg -n spoke-4-vnet --query "id" --output tsv)
-servicesvnetid=$(az network vnet show -g vwan-microhack-spoke-rg -n services-vnet --query "id" --output tsv)
-nvavnetid=$(az network vnet show -g vwan-microhack-spoke-rg -n nva-vnet --query "id" --output tsv)
-wedefaultrtid=$(az network vhub route-table show --name defaultRouteTable --resource-group vwan-microhack-hub-rg --vhub-name microhack-we-hub --query id --output tsv)
+#!/bin/bash
+##########################################################
+# prep-for-scenario-5.sh
+##########################################################
 
-echo "Removing associations and propagations from rt-shared-we"
+# Source our bash library
+. ./lib.sh
 
-wesharedrtid=$(az network vhub route-table show --name "RT-Shared-we" --resource-group "vwan-microhack-hub-rg" --vhub-name microhack-we-hub --query id --output tsv)
-WERESTEP="https://management.azure.com${wesharedrtid}?api-version=2020-05-01"
-az rest --method put --uri "$WERESTEP" --body @emptyrtbody.json
-while [[ $(az rest --uri $WERESTEP | jq .properties.provisioningState) != "\"Succeeded\"" ]]; do sleep 30; done
-spoke1connection=$(az network vhub connection show -n spoke-1-we -g vwan-microhack-hub-rg --vhub-name microhack-we-hub --query "id" -o tsv)
-spoke2connection=$(az network vhub connection show -n spoke-2-we -g vwan-microhack-hub-rg --vhub-name microhack-we-hub --query "id" -o tsv)
-servicesvnetconnection=$(az network vhub connection show -n services-we -g vwan-microhack-hub-rg --vhub-name microhack-we-hub --query "id" -o tsv)
-WEVNETCONNECTIONSPOKE1="https://management.azure.com${spoke1connection}?api-version=2020-05-01"
-WEVNETCONNECTIONSPOKE2="https://management.azure.com${spoke2connection}?api-version=2020-05-01"
-WEVNETCONNECTIONSERVICES="https://management.azure.com${servicesvnetconnection}?api-version=2020-05-01"
-sed "s#spokevnetid#$spoke1vnetid#g" emptyspokeconnection.json | tee emptyspokeconnection-spoke1.json
-sed -i "s#wedefaultrtid#$wedefaultrtid#g" emptyspokeconnection-spoke1.json
-sed "s#spokevnetid#$spoke2vnetid#g" emptyspokeconnection.json | tee emptyspokeconnection-spoke2.json
-sed -i "s#wedefaultrtid#$wedefaultrtid#g" emptyspokeconnection-spoke2.json
-sed "s#spokevnetid#$servicesvnetid#g" emptyspokeconnection.json | tee emptyspokeconnection-services.json
-sed -i "s#wedefaultrtid#$wedefaultrtid#g" emptyspokeconnection-services.json
-az rest --method put --uri $WEVNETCONNECTIONSPOKE1 --body @emptyspokeconnection-spoke1.json
-while [[ $(az rest --uri $WEVNETCONNECTIONSPOKE1 | jq .properties.provisioningState) != "\"Succeeded\"" ]]; do sleep 30; done
-az rest --method put --uri $WEVNETCONNECTIONSPOKE2 --body @emptyspokeconnection-spoke2.json
-while [[ $(az rest --uri $WEVNETCONNECTIONSPOKE2 | jq .properties.provisioningState) != "\"Succeeded\"" ]]; do sleep 30; done
-az rest --method put --uri $WEVNETCONNECTIONSERVICES --body @emptyspokeconnection-services.json
-while [[ $(az rest --uri $WEVNETCONNECTIONSERVICES | jq .properties.provisioningState) != "\"Succeeded\"" ]]; do sleep 30; done
+vwan=microhack-vwan
+rg=vwan-microhack-hub-rg
+vwanid=$(az network vwan show --name $vwan -g$rg --query id --output tsv)
 
+####################################################################
 
+banner "Removing connections spoke-1-we and spoke-2-we from vhub microhack-we-hub"
 
-echo "# removing connection spoke-1-we"
-az network vhub connection delete -n spoke-1-we -g vwan-microhack-hub-rg --vhub-name microhack-we-hub
-echo "# removing connection spoke-2-we"
-az network vhub connection delete -n spoke-2-we -g vwan-microhack-hub-rg --vhub-name microhack-we-hub
+for connection in spoke-1-we spoke-2-we
+do
+  if az network vhub connection show --name $connection --resource-group vwan-microhack-hub-rg --vhub-name microhack-we-hub --output none 2>/dev/null
+  then
+    printf "%s " "Removing connection $connection..."
+    az network vhub connection delete --name $connection --vhub-name microhack-we-hub --resource-group vwan-microhack-hub-rg --yes --output none
+    [[ $? -eq 0 ]] && echo "✔️" || error "Failed to delete connection $connection from vhub microhack-we-hub"
+  else
+    echo "The $connection connection has already been removed."
+  fi
+done
 
+####################################################################
 
+banner "Removing route table RT-Shared-we from vhub microhack-we-hub"
 
-echo "Removing associations and propagations from rt-shared-useast"
-useastdefaultrtid=$(az network vhub route-table show --name defaultRouteTable --resource-group vwan-microhack-hub-rg --vhub-name microhack-useast-hub --query id --output tsv)
-useastsharedrtid=$(az network vhub route-table show --name "rt-shared-useast" --resource-group "vwan-microhack-hub-rg" --vhub-name microhack-useast-hub --query id --output tsv)
-USEASTRESTEP="https://management.azure.com${useastsharedrtid}?api-version=2020-05-01"
-az rest --method put --uri "$USEASTRESTEP" --body @emptyrtbody.json
-while [[ $(az rest --uri $USEASTRESTEP | jq .properties.provisioningState) != "\"Succeeded\"" ]]; do sleep 30; done
-spoke3connection=$(az network vhub connection show -n spoke-3-useast -g vwan-microhack-hub-rg --vhub-name microhack-useast-hub --query "id" -o tsv)
-spoke4connection=$(az network vhub connection show -n spoke-4-useast -g vwan-microhack-hub-rg --vhub-name microhack-useast-hub --query "id" -o tsv)
-USEASTVNETCONNECTIONSPOKE3="https://management.azure.com${spoke3connection}?api-version=2020-05-01"
-USEASTVNETCONNECTIONSPOKE4="https://management.azure.com${spoke4connection}?api-version=2020-05-01"
-sed "s#spokevnetid#$spoke3vnetid#g" emptyspokeconnection.json | tee emptyspokeconnection-spoke3.json
-sed -i "s#wedefaultrtid#$useastdefaultrtid#g" emptyspokeconnection-spoke3.json
-sed "s#spokevnetid#$spoke4vnetid#g" emptyspokeconnection.json | tee emptyspokeconnection-spoke4.json
-sed -i "s#wedefaultrtid#$useastdefaultrtid#g" emptyspokeconnection-spoke4.json
-az rest --method put --uri $USEASTVNETCONNECTIONSPOKE3 --body @emptyspokeconnection-spoke3.json
-while [[ $(az rest --uri $USEASTVNETCONNECTIONSPOKE3 | jq .properties.provisioningState) != "\"Succeeded\"" ]]; do sleep 30; done
-az rest --method put --uri $USEASTVNETCONNECTIONSPOKE4 --body @emptyspokeconnection-spoke4.json
-while [[ $(az rest --uri $USEASTVNETCONNECTIONSPOKE4 | jq .properties.provisioningState) != "\"Succeeded\"" ]]; do sleep 30; done
+delete_route_table microhack-we-hub RT-Shared-we
 
+####################################################################
 
-ONPREMCONNECTIONID=$(az network vpn-gateway list -g vwan-microhack-hub-rg --query [].connections[].id -o tsv)
-ONPREMCONNECTIONRESTEP="https://management.azure.com${ONPREMCONNECTIONID}?api-version=2020-05-01"
-ONPREMCONNECTIONVPNSITE=$(az network vpn-gateway list -g vwan-microhack-hub-rg --query [].connections[].remoteVpnSite.id -o tsv)
-sed "s#wedefaultrtid#$wedefaultrtid#g" onpremconnection.json | tee onpremconnection-values.json
-sed -i "s#ONPREMCONNECTIONVPNSITE#$ONPREMCONNECTIONVPNSITE#g" onpremconnection-values.json
-az rest --method put --uri $ONPREMCONNECTIONRESTEP --body @onpremconnection-values.json
-while [[ $(az rest --uri $ONPREMCONNECTIONRESTEP | jq .properties.provisioningState) != "\"Succeeded\"" ]]; do sleep 30; done
+banner "Removing route table RT-Shared-useast from vhub microhack-useast-hub"
 
+delete_route_table microhack-useast-hub RT-Shared-useast
 
-echo "Deleting rt-shared-useast"
-az network vhub route-table delete --name rt-shared-useast -g vwan-microhack-hub-rg --vhub-name microhack-useast-hub
-echo "Deleting rt-shared-we"
-az network vhub route-table delete --name rt-shared-we -g vwan-microhack-hub-rg --vhub-name microhack-we-hub
+####################################################################
 
-echo "# connecting nva-vnet"
-az network vhub connection create -n nva-we -g vwan-microhack-hub-rg --vhub-name microhack-we-hub --remote-vnet $nvavnetid --no-wait
+banner "Peering nva-vnet to vhub and to spokes 1 and 2"
 
-echo "# peering spoke-1-vnet to nva-vnet"
-az network vnet peering create --name spoke1-to-nva --resource-group vwan-microhack-spoke-rg --vnet-name spoke-1-vnet --remote-vnet nva-vnet --allow-vnet-access --allow-forwarded-traffic
-az network vnet peering create --name nva-to-spoke1 --resource-group vwan-microhack-spoke-rg --vnet-name nva-vnet --remote-vnet spoke-1-vnet --allow-vnet-access --allow-forwarded-traffic
-echo "# peering spoke-2-vnet to nva-vnet"
-az network vnet peering create --name spoke2-to-nva --resource-group vwan-microhack-spoke-rg --vnet-name spoke-2-vnet --remote-vnet nva-vnet --allow-vnet-access --allow-forwarded-traffic
-az network vnet peering create --name nva-to-spoke2 --resource-group vwan-microhack-spoke-rg --vnet-name nva-vnet --remote-vnet spoke-2-vnet --allow-vnet-access --allow-forwarded-traffic
+echo "Connecting virtual network nva-vnet to vhub microhack-we-hub"
+nvavnetid=$(az network vnet show --name nva-vnet --resource-group vwan-microhack-spoke-rg --query "id" --output tsv)
+az network vhub connection create --name nva-we --vhub-name microhack-we-hub --remote-vnet $nvavnetid --resource-group vwan-microhack-hub-rg --no-wait --output jsonc
+echo "Submitted with --no-wait. Check status in the portal before using."
+
+echo
+
+echo "Peering spoke-1-vnet to nva-vnet"
+az network vnet peering create --name spoke1-to-nva --resource-group vwan-microhack-spoke-rg --vnet-name spoke-1-vnet --remote-vnet nva-vnet --allow-vnet-access --allow-forwarded-traffic --output jsonc
+echo "Peering nva-vnet back to spoke-1-vnet"
+az network vnet peering create --name nva-to-spoke1 --resource-group vwan-microhack-spoke-rg --vnet-name nva-vnet --remote-vnet spoke-1-vnet --allow-vnet-access --allow-forwarded-traffic --output jsonc
+
+echo
+
+echo "Peering spoke-2-vnet to nva-vnet"
+az network vnet peering create --name spoke2-to-nva --resource-group vwan-microhack-spoke-rg --vnet-name spoke-2-vnet --remote-vnet nva-vnet --allow-vnet-access --allow-forwarded-traffic --output jsonc
+echo "Peering nva-vnet back to spoke-2-vnet"
+az network vnet peering create --name nva-to-spoke2 --resource-group vwan-microhack-spoke-rg --vnet-name nva-vnet --remote-vnet spoke-2-vnet --allow-vnet-access --allow-forwarded-traffic --output jsonc
+
+banner "Complete"

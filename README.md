@@ -529,15 +529,25 @@ In the microhack-we-hub, under Connectivity select Routing and then +Create rout
   - Under Virtual Networks, select services-vnet but do *not* select the Spokes
 - Click Create
 
+It will take a few minutes for the changes to complete.
+
+- _Deployment in progress..._ will show in the notifications
+- The route table provisioning state will move from _Updating_ to _Succeeded_
+- Click on Overview
+- The hub status will change back and forth as it loops over the connections
+  - configuring changes to propagations and associations
+  - the hub status will move to _Updating_ and then to _Succeeded_ each time
+- You will then get the _Deployment succeeded_ notification once all connections are updated
+
 The Routing view of the West Europe Hub hub now shows 2 connections associated to the Default table (Shared Service Spoke and Branch), and 4 connections propagating to the Default table (both Spokes, Shared Services and Branch).
 
 The RT-Shared-we table has 2 connections associated (both Spokes), and 2 connections propagating (Shared Services and Branch).
 
 ![image](images/scenario-4-we-routetables.png)
 
-:exclamation: It may take a few minutes for the changes to complete. If RT-Shared-does not look as expected, edit the table and correct the Associations and Propagations settings per the instructions above.
+:exclamation: Before proceeding, ensure that the routing view of microhack-we-hub look as above, and that microhack-we-hub shows Succeeded for Hub status and Routing status.
 
-Before proceeding, ensure that the routing view of microhack-we-hub look as above, and that microhack-we-hub shows Succeeded for Hub status and Routing status.
+
 
 ## :hand: US East Hub
 
@@ -564,11 +574,11 @@ Routing for the US East Hub shows both Spoke VNET connections propagating to the
 
 For the **Shared Services VNET**, this is configured on the connection, and we will use the Shared label which groups the RT-Shared tables in both hubs.
 
-In the microhack-vwan view, select Virtual network connections. Expand the connections on microhack-we-hub, click the elipsis at the end of the services-vnet row and select Edit. In the Propagate to labels drop-down, select both default and Shared labels, and click Confirm.
+In the microhack-vwan view, select Virtual network connections. Expand the connections on microhack-we-hub, click the ellipsis at the end of the services-vnet row and select Edit. In the Propagate to labels drop-down, select both default and Shared labels, and click Confirm.
 
 ![image](images/scenario-4-edit-shared.png)
 
-To let the **Branch** route propagate accross to the East US Hub, the Branches setting in the Propagations tab of RT-Shared-we, the Shared table in the **West Europe** hub, must be updated. Edit RT-Shared-we, click the Propgations tab. Under Branches (Site VPN/ExpressRoute/User VPN) ensure both default and Shared are selected. Click Create.
+To let the **Branch** route propagate across to the East US Hub, the Branches setting in the Propagations tab of RT-Shared-we, the Shared table in the **West Europe** hub, must be updated. Edit RT-Shared-we, click the Propagations tab. Under Branches (Site VPN/ExpressRoute/User VPN) ensure both default and Shared are selected. Click Create.
 
 ![image](images/scenario-4-edit-branch.png)
 
