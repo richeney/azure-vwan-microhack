@@ -74,6 +74,7 @@ resource "azurerm_public_ip" "bastion-spoke-4-pip" {
   resource_group_name = azurerm_resource_group.vwan-microhack-spoke-rg.name
   allocation_method   = "Static"
   sku                 = "Standard"
+  availability_zone   = "No-Zone" // No zones in uswest
 }
 
 resource "azurerm_bastion_host" "bastion-spoke-4" {

@@ -398,7 +398,7 @@ resource "azurerm_network_interface" "spoke-addc-1-nic" {
 #######################################################################
 
 module "spoke-1" {
-  source     = "./modules/windows_server"
+  source = "./modules/windows_server"
 
   name                = "spoke-1"
   location            = var.location-spoke-1
@@ -414,7 +414,7 @@ module "spoke-1" {
 #######################################################################
 
 module "spoke-2" {
-  source     = "./modules/windows_server"
+  source = "./modules/windows_server"
 
   name                = "spoke-2"
   location            = var.location-spoke-2
@@ -430,7 +430,7 @@ module "spoke-2" {
 #######################################################################
 
 module "spoke-3" {
-  source     = "./modules/windows_server"
+  source = "./modules/windows_server"
 
   name                = "spoke-3"
   location            = var.location-spoke-3
@@ -447,7 +447,7 @@ module "spoke-3" {
 #######################################################################
 
 module "spoke-4" {
-  source     = "./modules/windows_server"
+  source = "./modules/windows_server"
 
   name                = "spoke-4"
   location            = var.location-spoke-4
@@ -463,7 +463,7 @@ module "spoke-4" {
 #######################################################################
 
 module "onprem" {
-  source     = "./modules/windows_server"
+  source = "./modules/windows_server"
 
   name                = "onprem"
   location            = var.location-onprem
@@ -481,7 +481,7 @@ module "onprem" {
 #######################################################################
 
 module "spoke-addc" {
-  source     = "./modules/windows_server"
+  source = "./modules/windows_server"
 
   name                = "spoke-addc"
   location            = var.location-spoke-services
